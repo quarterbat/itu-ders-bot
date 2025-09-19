@@ -8,6 +8,14 @@ import time
 import traceback
 from datetime import datetime
 
+import os
+
+# Token'ı Railway Variables'tan al
+API_KEY = os.getenv('TELEGRAM_TOKEN')
+if not API_KEY:
+    print("❌ TELEGRAM_TOKEN bulunamadı! Railway Variables'e ekleyin.")
+    exit(1)
+
 # === Loglama Ayarları ===
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -15,8 +23,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# === Telegram Ayarları ===
-API_KEY = "7980506780:AAHcKJvk6LXFfa_Co5lvk-znFkTRCOzTNxI"
 
 # === OBS URL'leri ===
 BASE_URL = "https://obs.itu.edu.tr/public/DersProgram/DersProgramSearch"
@@ -774,4 +780,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n💥 Kritik hata: {e}")
         print(f"   Hata tipi: {type(e)}")
+
         input("Devam etmek için Enter'a basın...")
