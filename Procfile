@@ -1,1 +1,1 @@
-worker: python itu_ders_kontenjan_bot
+worker: python itu_ders_kontenjan_bot.py
