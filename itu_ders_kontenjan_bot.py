@@ -7,7 +7,8 @@ import asyncio
 import time
 import traceback
 from datetime import datetime
-
+from flask import Flask, jsonify
+import threading
 import os
 
 # Token'ı Railway Variables'tan al
@@ -725,6 +726,25 @@ async def status_command(update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(status_message, parse_mode='Markdown')
     print(f"✅ {chat_id} için durum gösterildi ({count if 'count' in locals() else 0} ders)")
 
+def create_health_server():
+    app = Flask(__name__)
+    
+    @app.route('/')
+    def health():
+        return jsonify({
+            "status": "healthy",
+            "service": "İTÜ Ders Bot",
+            "uptime": "100%"
+        })
+    
+    @app.route('/health')
+    def health_check():
+        return jsonify({"status": "ok"})
+    
+    port = int(os.environ.get('PORT', 8080))
+    print(f"🌐 Health server port: {port}")
+    
+    app.run(host='0.0.0.0', port=port, debug=False)
 
 def main():
     """Ana fonksiyon - KONTENJAN TAKİP MODU"""
@@ -770,6 +790,12 @@ def main():
     print("⏹️  PyCharm'da durdurmak için: Ctrl+C")
     print("=" * 75)
 
+    # Health server arka planda
+    server_thread = threading.Thread(target=create_health_server, daemon=True)
+    server_thread.start()
+
+    print("🌐 Health server aktif (502 çözüldü)")
+
     app.run_polling(drop_pending_updates=True)
 
 if __name__ == "__main__":
@@ -782,5 +808,6 @@ if __name__ == "__main__":
         print(f"   Hata tipi: {type(e)}")
         # Railway'de input() çalışmaz, sessiz kal
         print("🔄 Railway ortamı algılandı, input beklenmiyor.")
+
 
 
