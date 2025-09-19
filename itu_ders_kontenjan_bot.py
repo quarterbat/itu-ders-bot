@@ -780,5 +780,6 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n💥 Kritik hata: {e}")
         print(f"   Hata tipi: {type(e)}")
+        # Railway'de input() çalışmaz, sessiz kal
+        print("🔄 Railway ortamı algılandı, input beklenmiyor.")
 
-        input("Devam etmek için Enter'a basın...")
