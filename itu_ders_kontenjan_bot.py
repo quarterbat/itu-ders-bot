@@ -188,7 +188,7 @@ async def check_course(context: ContextTypes.DEFAULT_TYPE):
             WATCHED_COURSES[chat_id].remove((program_code, crn))
             if not WATCHED_COURSES[chat_id]:
                 del WATCHED_COURSES[chat_id]
-            context.job.schedule_removal()
+            context.application.job_queue.remove_job(job.name)
 
 
 def search_course(program_code, crn, is_background=False):
@@ -556,7 +556,7 @@ async def handle_message(update, context: ContextTypes.DEFAULT_TYPE):
                             WATCHED_COURSES[chat_id] = []
                         if (program_code, crn_input) not in WATCHED_COURSES[chat_id]:
                             WATCHED_COURSES[chat_id].append((program_code, crn_input))
-                            context.job_queue.run_repeating(
+                            context.application.job_queue.run_repeating(
                                 check_course,
                                 interval=60,  # Her 1 dakikada bir kontrol
                                 data=(chat_id, program_code, crn_input),
@@ -782,4 +782,5 @@ if __name__ == "__main__":
         print(f"   Hata tipi: {type(e)}")
         # Railway'de input() çalışmaz, sessiz kal
         print("🔄 Railway ortamı algılandı, input beklenmiyor.")
+
 
