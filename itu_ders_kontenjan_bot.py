@@ -833,14 +833,11 @@ def main():
         app_flask.run(host='0.0.0.0', port=port, debug=False)
 
     # Server thread başlat
+    # Health server thread başlat
     server_thread = threading.Thread(target=create_health_server, daemon=True)
-    try:
-        server_thread.start()
-        time.sleep(2)  # Server'ın başlaması için bekle
-        print("🌐 Health server aktif - Polling başlıyor")
-    except Exception as e:
-        print(f"⚠️ Health server hatası: {e}")
-
+    server_thread.start()
+    time.sleep(5)  # Sağlık kontrol server'ı hazır olsun
+    print("🌐 Health server aktif - Polling başlıyor")
     app.run_polling(drop_pending_updates=True)
 
 
