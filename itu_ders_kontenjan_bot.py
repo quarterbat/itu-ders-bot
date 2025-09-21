@@ -9,7 +9,7 @@ import asyncio
 import time
 import traceback
 from datetime import datetime
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import threading
 import os
 
@@ -820,6 +820,8 @@ def main():
         @app_flask.route('/')
         @app_flask.route('/health')
         def health_check():
+            if request.path == '/':
+                return "OK", 200  # ← Root için hızlı text
             return jsonify({
                 "status": "healthy",
                 "service": "İTÜ Ders Bot",
