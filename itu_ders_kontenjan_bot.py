@@ -760,10 +760,13 @@ def create_health_server():
     def health_check():
         return jsonify({"status": "ok"})
 
-    port = int(os.environ.get('PORT', 8080))
+    port = int(os.environ.get('PORT') or 8080)
     print(f"🌐 Health server port: {port}")
 
     app.run(host='0.0.0.0', port=port, debug=False)
+
+
+
 
 
 def main():
@@ -823,14 +826,18 @@ def main():
                 "uptime": "100%"
             })
 
-        port = int(os.environ.get('PORT', 8080))
+        port = int(os.environ.get('PORT') or 8080)
         print(f"🌐 Health server port: {port}")
         app_flask.run(host='0.0.0.0', port=port, debug=False)
 
     # Server thread başlat
     server_thread = threading.Thread(target=create_health_server, daemon=True)
-    server_thread.start()
-    print("🌐 Health server aktif")
+    try:
+        server_thread.start()
+        time.sleep(2)  # Server'ın başlaması için bekle
+        print("🌐 Health server aktif - Polling başlıyor")
+    except Exception as e:
+        print(f"⚠️ Health server hatası: {e}")
 
     app.run_polling(drop_pending_updates=True)
 
