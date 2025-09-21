@@ -180,7 +180,7 @@ async def check_course(context: ContextTypes.DEFAULT_TYPE):
     LAST_REQUEST_TIME[chat_id] = time.time()
 
     if result:
-        await context.bot.send_message(
+        await context.application.bot.send_message(
             chat_id=chat_id,
             text=result,
             parse_mode='Markdown'
@@ -810,11 +810,27 @@ def main():
     print("⏹️  PyCharm'da durdurmak için: Ctrl+C")
     print("=" * 75)
 
-    # Health server arka planda
+    # Health server (arka planda)
+    def create_health_server():
+        app_flask = Flask(__name__)
+
+        @app_flask.route('/')
+        @app_flask.route('/health')
+        def health_check():
+            return jsonify({
+                "status": "healthy",
+                "service": "İTÜ Ders Bot",
+                "uptime": "100%"
+            })
+
+        port = int(os.environ.get('PORT', 8080))
+        print(f"🌐 Health server port: {port}")
+        app_flask.run(host='0.0.0.0', port=port, debug=False)
+
+    # Server thread başlat
     server_thread = threading.Thread(target=create_health_server, daemon=True)
     server_thread.start()
-
-    print("🌐 Health server aktif (502 çözüldü)")
+    print("🌐 Health server aktif")
 
     app.run_polling(drop_pending_updates=True)
 
@@ -829,6 +845,5 @@ if __name__ == "__main__":
         print(f"   Hata tipi: {type(e)}")
         # Railway'de input() çalışmaz, sessiz kal
         print("🔄 Railway ortamı algılandı, input beklenmiyor.")
-
 
 
