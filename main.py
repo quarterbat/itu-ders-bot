@@ -768,97 +768,47 @@ def create_health_server():
 
 
 
-
 def main():
-    """Ana fonksiyon - KONTENJAN TAKİP MODU"""
+    """Ana fonksiyon - PythonAnywhere İçin Sadeleştirilmiş Versiyon"""
     global WATCHED_COURSES, LAST_REQUEST_TIME
     WATCHED_COURSES = {}
     LAST_REQUEST_TIME = {}
 
-    print("🤖 İTÜ DERS KONTENJAN BOTU v3.1 - DAKİKALIK KONTENJAN TAKİP")
-    print("=" * 75)
-    print(f"📂 Toplam {len(PROGRAM_KODLARI)} program kodu yüklendi")
-    print(f"🔗 1. Kutucuk: Lisans (LS) - SABİT")
-    print(f"🔗 2. Kutucuk: Kullanıcı girdisi -> OBS ID")
-    print(f"   📋 Örnek: END -> {PROGRAM_KODLARI.get('END', 'YOK')}")
-    print(f"   📋 Örnek: TUR -> {PROGRAM_KODLARI.get('TUR', 'YOK')}")
-    print(f"   📋 Örnek: KIM -> {PROGRAM_KODLARI.get('KIM', 'YOK')}")
-    print(f"   📋 Örnek: BHB -> {PROGRAM_KODLARI.get('BHB', 'YOK')}")
-    print(f"📊 Kolonlar: [0]CRN [1]Kod [2]Ad [6]Gün [7]Saat [9]KONTENJAN [10]YAZILAN")
-    print(f"⏳ TAKİP: Kontenjan yok → Mesaj | Açılınca → Detaylı bildirim (HER DAKİKA)")
-    print(f"🚨 KOMUTLAR: /stop - Durdur | /cancel - İptal | /status - Durum")
+    print("🤖 İTÜ DERS KONTENJAN BOTU v3.1 Başlatılıyor...")
     print("=" * 75)
 
+    # 1. Uygulamayı (Application) oluştur
+    # Not: API_KEY'in yukarıda os.getenv ile tanımlandığından emin ol
     app = ApplicationBuilder().token(API_KEY).build()
 
-    # Mevcut handler'lara ekleyin
+    # 2. Handler'ları (Komutları ve Mesaj Dinleyicileri) ekle
     app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CommandHandler("help", help_command))
-    app.add_handler(CommandHandler("stop", stop_command))  # YENİ
-    app.add_handler(CommandHandler("cancel", cancel_command))  # YENİ
-    app.add_handler(CommandHandler("status", status_command))  # YENİ
+    app.add_handler(CommandHandler("stop", stop_command))
+    app.add_handler(CommandHandler("cancel", cancel_command))
+    app.add_handler(CommandHandler("status", status_command))
+    
+    # Kelime mesajlarını dinleyen kısım
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    
+    # Hata yakalayıcı
     app.add_error_handler(error_handler)
 
-    print("✅ Bot başarıyla başlatıldı! (Dakikalık Kontenjan Takip Modu)")
-    print("📱 Telegram'da test edin:")
-    print("   • /start - Botu başlat")
-    print("   • /stop - Botu durdur")
-    print("   • /cancel - Takibi iptal et")
-    print("   • /status - Takip edilen dersleri göster")
-    print("   • END_12345 - Test")
-    print("   • BHB_15079 - Test (35/9 → bildirim YOK)")
-    print("   • BHB_15081 - Test (30/0 → takip mesajı)")
-    print("   • /help - Detaylı yardım")
-    print("⏹️  PyCharm'da durdurmak için: Ctrl+C")
+    print("✅ Bot mesajları dinlemeye başladı (Polling)...")
+    print("📱 Telegram üzerinden /start yazarak test edebilirsin.")
     print("=" * 75)
 
-    # Health server (arka planda)
-    def create_health_server():
-        app_flask = Flask(__name__)
-
-        @app_flask.route('/')
-        @app_flask.route('/health')
-        def health_check():
-            if request.path == '/':
-                return "OK", 200  # ← Root için hızlı text
-            return jsonify({
-                "status": "healthy",
-                "service": "İTÜ Ders Bot",
-                "uptime": "100%"
-            })
-
-        port = int(os.environ.get('PORT') or 8080)
-        print(f"🌐 Health server port: {port}")
-        app_flask.run(host='0.0.0.0', port=port, debug=False)
-
-    # Server thread başlat
-    # Health server thread başlat
-    server_thread = threading.Thread(target=create_health_server, daemon=True)
-    server_thread.start()
-    time.sleep(5)  # Sağlık kontrol server'ı hazır olsun
-    print("🌐 Health server aktif - Bot başlıyor")
-    async def run_bot():
-        await app.initialize()
-        await app.start()
-        await app.bot.initialize()
-    
-        print("🤖 Bot aktif ve çalışıyor...")
-        await asyncio.Event().wait()
-    
-    asyncio.run(run_bot())
-
+    # 3. MESAJLARI DİNLEME DÖNGÜSÜNÜ BAŞLAT
+    # run_polling() hem botu başlatır, hem de mesaj gelmesini bekler.
+    # PythonAnywhere'de en stabil yöntem budur.
+    app.run_polling()
 
 if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print("\n👋 Bot kullanıcı tarafından durduruldu (Ctrl+C)")
-    except Exception as e:
-        print(f"\n💥 Kritik hata: {e}")
-        print(f"   Hata tipi: {type(e)}")
-        # Railway'de input() çalışmaz, sessiz kal
-        print("🔄 Railway ortamı algılandı, input beklenmiyor.")
+        print("\n👋 Bot kapatıldı.")
+
 
 
 
