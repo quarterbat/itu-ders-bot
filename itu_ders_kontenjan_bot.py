@@ -837,8 +837,16 @@ def main():
     server_thread = threading.Thread(target=create_health_server, daemon=True)
     server_thread.start()
     time.sleep(5)  # Sağlık kontrol server'ı hazır olsun
-    print("🌐 Health server aktif - Polling başlıyor")
-    app.run_polling(drop_pending_updates=True)
+    print("🌐 Health server aktif - Bot başlıyor")
+    async def run_bot():
+        await app.initialize()
+        await app.start()
+        await app.bot.initialize()
+    
+        print("🤖 Bot aktif ve çalışıyor...")
+        await asyncio.Event().wait()
+    
+    asyncio.run(run_bot())
 
 
 if __name__ == "__main__":
@@ -851,5 +859,6 @@ if __name__ == "__main__":
         print(f"   Hata tipi: {type(e)}")
         # Railway'de input() çalışmaz, sessiz kal
         print("🔄 Railway ortamı algılandı, input beklenmiyor.")
+
 
 
