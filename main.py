@@ -760,10 +760,10 @@ def create_health_server():
     def health_check():
         return jsonify({"status": "ok"})
 
-    port = int(os.environ.get('PORT') or 8080)
+    port = int(os.environ.get('PORT', '8080'))
     print(f"🌐 Health server port: {port}")
 
-    app.run(host='0.0.0.0', port=port, debug=False)
+    app.run(host='0.0.0.0', port=port, debug=False, threaded=True)
 
 
 
@@ -828,9 +828,9 @@ def main():
                 "uptime": "100%"
             })
 
-        port = int(os.environ.get('PORT') or 8080)
+        port = int(os.environ.get('PORT', '8080'))
         print(f"🌐 Health server port: {port}")
-        app_flask.run(host='0.0.0.0', port=port, debug=False)
+        app_flask.run(host='0.0.0.0', port=port, debug=False, threaded=True)
 
     # Server thread başlat
     # Health server thread başlat
@@ -859,6 +859,3 @@ if __name__ == "__main__":
         print(f"   Hata tipi: {type(e)}")
         # Railway'de input() çalışmaz, sessiz kal
         print("🔄 Railway ortamı algılandı, input beklenmiyor.")
-
-
-
