@@ -13,6 +13,15 @@ from flask import Flask, jsonify, request
 import threading
 import os
 
+
+# === Global Session ===
+SESSION = requests.Session()
+SESSION.headers.update({
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'Accept-Language': 'tr-TR,tr;q=0.9,en;q=0.8'
+})
+
+
 # Token'ı Railway Variables'tan al
 API_KEY = os.getenv('TELEGRAM_TOKEN')
 if not API_KEY:
