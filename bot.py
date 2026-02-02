@@ -841,7 +841,7 @@ def main():
     async def run_bot():
         await app.initialize()
         await app.start()
-        await app.bot.initialize()
+        await app.updater.start_polling()  # ← POLLING BAŞLAT!
     
         print("🤖 Bot aktif ve çalışıyor...")
         await asyncio.Event().wait()
