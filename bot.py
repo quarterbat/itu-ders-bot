@@ -575,6 +575,9 @@ async def handle_message(update, context: ContextTypes.DEFAULT_TYPE):
                             WATCHED_COURSES[chat_id] = []
                         if (program_code, crn_input) not in WATCHED_COURSES[chat_id]:
                             WATCHED_COURSES[chat_id].append((program_code, crn_input))
+                            if context.application.job_queue is None:
+                                await update.message.reply_text("❌ Takip sistemi aktif değil. Bot yeniden başlatılmalı.")
+                                return
                             context.application.job_queue.run_repeating(
                                 check_course,
                                 interval=60,  # Her 1 dakikada bir kontrol
@@ -798,7 +801,12 @@ def main():
     print(f"🚨 KOMUTLAR: /stop - Durdur | /cancel - İptal | /status - Durum")
     print("=" * 75)
 
-    app = ApplicationBuilder().token(API_KEY).build()
+    app = (
+        ApplicationBuilder()
+        .token(API_KEY)
+        .job_queue(JobQueue())   # <-- BUNU EKLİYORSUN
+        .build()
+    )
 
     # Mevcut handler'lara ekleyin
     app.add_handler(CommandHandler("start", start_command))
@@ -868,3 +876,4 @@ if __name__ == "__main__":
         print(f"   Hata tipi: {type(e)}")
         # Railway'de input() çalışmaz, sessiz kal
         print("🔄 Railway ortamı algılandı, input beklenmiyor.")
+
