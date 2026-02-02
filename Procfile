@@ -1,1 +1,1 @@
-web: python itu_ders_kontenjan_bot.py
+web: python bot.py
